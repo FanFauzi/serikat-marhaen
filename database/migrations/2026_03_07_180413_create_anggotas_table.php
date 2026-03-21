@@ -13,10 +13,16 @@ return new class extends Migration
     {
         Schema::create('anggotas', function (Blueprint $table) {
             $table->id(); // ID unik otomatis
-            $table->string('nama'); // Nama lengkap anggota
-            $table->string('program_studi'); // Jurusan/Prodi di Unimma
-            $table->string('status'); // Contoh: Calon Anggota, Kader Aktif, Pengurus (Diubah dari status_kader)
-            $table->string('foto')->nullable(); // Foto anggota
+            $table->string('nama');
+            $table->string('dpk_asal')->default('DPK GMNI Unimma Kampus 2');
+            $table->string('fakultas')->nullable();
+            $table->string('jurusan')->nullable(); 
+            $table->string('no_hp')->nullable();
+            $table->string('ttl')->nullable();
+            $table->string('angkatan')->nullable();
+            $table->text('alamat')->nullable();
+            $table->string('status')->default('Anggota'); 
+            $table->string('foto')->nullable();
             $table->timestamps(); 
         });
     }

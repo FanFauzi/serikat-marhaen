@@ -17,8 +17,10 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::post('/anggota/import', [App\Http\Controllers\AnggotaController::class, 'import'])->name('anggota.import');
+
     Route::resource('anggota', AnggotaController::class);
     Route::resource('kegiatan', KegiatanController::class);
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

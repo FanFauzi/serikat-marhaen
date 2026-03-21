@@ -13,8 +13,8 @@ class AnggotaController extends Controller
      */
     public function index()
     {
-        $semua_anggota = Anggota::latest()->get();
-        return view('anggota.index', compact('semua_anggota'));
+        $anggota = Anggota::latest()->get();
+        return view('anggota.index', compact('anggota'));
     }
 
     /**
@@ -55,7 +55,11 @@ class AnggotaController extends Controller
      */
     public function show(string $id)
     {
-        //
+        // Cari data anggota berdasarkan ID
+        $anggota = Anggota::findOrFail($id);
+
+        // Tampilkan ke halaman show.blade.php
+        return view('anggota.show', compact('anggota'));
     }
 
     /**
@@ -94,6 +98,35 @@ class AnggotaController extends Controller
         $anggota->update($data);
 
         return redirect()->route('anggota.index')->with('success', 'Data anggota berhasil diperbarui!');
+    }
+
+    public function import(Request $request)
+    {
+        // Validasi wajib upload file CSV/TXT
+        $request->validate([
+            'file_anggota' => 'required|mimes:csv,txt|max:2048',
+        ]);
+
+        $file = $request->file('file_anggota');
+        $fileHandle = fopen($file->getPathname(), 'r');
+
+        // Lewati baris pertama (biasanya berisi judul kolom / Header)
+        $header = fgetcsv($fileHandle);
+
+        // Looping baca data baris demi baris
+        while (($row = fgetcsv($fileHandle)) !== false) {
+
+            if (!empty($row[0])) { // Pastikan namanya tidak kosong
+                Anggota::create([
+                    'nama' => $row[0],
+                    'nim' => $row[1] ?? '-',
+                    'jurusan' => $row[2] ?? '-',
+                ]);
+            }
+        }
+        fclose($fileHandle);
+
+        return redirect()->route('anggota.index')->with('success', 'Ratusan data anggota berhasil disedot ke database bray!');
     }
 
     /**
