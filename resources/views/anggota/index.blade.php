@@ -84,7 +84,16 @@
                                                     </a>
 
                                                     <a href="{{ route('anggota.edit', $item->id) }}"
-                                                        class="text-gray-500 hover:text-blue-600 p-2">Edit</a>
+                                                        class="text-blue-500 hover:underline mr-2">Edit</a>
+
+                                                    <form action="{{ route('anggota.destroy', $item->id) }}"
+                                                        method="POST" class="inline"
+                                                        onsubmit="return confirm('Yakin mau hapus postingan ini bray?')">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit"
+                                                            class="text-red-500 hover:underline">Hapus</button>
+                                                    </form>
                                                 </div>
                                             </td>
                                         </tr>

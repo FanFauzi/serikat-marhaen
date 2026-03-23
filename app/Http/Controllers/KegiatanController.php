@@ -39,7 +39,7 @@ class KegiatanController extends Controller
         ]);
 
         $data = $request->all();
-        // Ini sihirnya bray, otomatis bikin slug dari judul!
+        
         $data['slug'] = Str::slug($request->judul);
 
         if ($request->hasFile('foto')) {
