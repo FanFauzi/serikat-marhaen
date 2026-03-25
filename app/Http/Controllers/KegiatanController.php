@@ -29,26 +29,32 @@ class KegiatanController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+public function store(Request $request)
     {
         $request->validate([
             'judul' => 'required',
             'konten' => 'required',
-            'tanggal_kegiatan' => 'required|date',
-            'foto' => 'image|mimes:jpeg,png,jpg|max:2048'
+            'tgl_kegiatan' => 'required|date',
+            'foto_1' => 'image|mimes:jpg,png,jpeg|max:2048', // Minimal 1 foto utama
+            'foto_2' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+            'foto_3' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
         ]);
 
         $data = $request->all();
-        
-        $data['slug'] = Str::slug($request->judul);
+        // Bikin link otomatis dari judul (Auto-Slug)
+        $data['slug'] = Str::slug($request->judul) . '-' . Str::random(5); 
 
-        if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('foto-kegiatan', 'public');
+        // Loop untuk mengecek dan menyimpan 3 foto
+        for ($i = 1; $i <= 3; $i++) {
+            $nama_foto = 'foto_' . $i;
+            if ($request->hasFile($nama_foto)) {
+                $data[$nama_foto] = $request->file($nama_foto)->store('foto-kegiatan', 'public');
+            }
         }
 
         Kegiatan::create($data);
 
-        return redirect()->route('kegiatan.index')->with('success', 'Kegiatan berhasil diposting!');
+        return redirect()->route('kegiatan.index')->with('success', 'Kabar Pergerakan Berhasil Diupload');
     }
 
     /**
@@ -56,44 +62,54 @@ class KegiatanController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $kegiatan = Kegiatan::findOrFail($id);
+        return view('kegiatan.show', compact('kegiatan'));
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+  public function edit(string $id)
     {
         $kegiatan = Kegiatan::findOrFail($id);
         return view('kegiatan.edit', compact('kegiatan'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, string $id)
     {
+        // Validasi data yang diedit
         $request->validate([
             'judul' => 'required',
             'konten' => 'required',
-            'tanggal_kegiatan' => 'required|date',
-            'foto' => 'image|mimes:jpeg,png,jpg|max:2048'
+            'tgl_kegiatan' => 'required|date',
+            'foto_1' => 'nullable|image|mimes:jpg,png,jpeg|max:2048', 
+            'foto_2' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+            'foto_3' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
         ]);
 
         $kegiatan = Kegiatan::findOrFail($id);
         $data = $request->all();
-        $data['slug'] = Str::slug($request->judul); // Update slug jika judul berubah
 
-        if ($request->hasFile('foto')) {
-            if ($kegiatan->foto) {
-                Storage::disk('public')->delete($kegiatan->foto);
+        // Bikin ulang link/slug biar sesuai sama judul yang baru
+        $data['slug'] = Str::slug($request->judul) . '-' . Str::random(5);
+
+        // Cek 3 laci foto: Kalau ada file baru yang masuk, hapus file lamanya!
+        for ($i = 1; $i <= 3; $i++) {
+            $nama_foto = 'foto_' . $i;
+            
+            if ($request->hasFile($nama_foto)) {
+                // Hapus foto lama di server biar memori nggak penuh
+                if ($kegiatan->$nama_foto) {
+                    Storage::disk('public')->delete($kegiatan->$nama_foto);
+                }
+                // Simpan foto baru
+                $data[$nama_foto] = $request->file($nama_foto)->store('foto-kegiatan', 'public');
             }
-            $data['foto'] = $request->file('foto')->store('foto-kegiatan', 'public');
         }
 
         $kegiatan->update($data);
 
-        return redirect()->route('kegiatan.index')->with('success', 'Postingan kegiatan berhasil diperbarui!');
+        return redirect()->route('kegiatan.index')->with('success', 'Mantap! Kabar Pergerakan berhasil diupdate bray!');
     }
 
     /**

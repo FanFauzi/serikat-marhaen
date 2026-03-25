@@ -6,25 +6,24 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Jalankan migration untuk membuat tabel.
-     */
     public function up(): void
     {
         Schema::create('kegiatans', function (Blueprint $table) {
-            $table->id(); // ID unik otomatis
-            $table->string('judul'); // Judul kegiatan
-            $table->string('slug')->unique(); // URL ramah SEO (contoh: /kegiatan/makrab-2026)
-            $table->text('konten'); // Isi/deskripsi kegiatan
-            $table->string('foto')->nullable(); // Foto kegiatan (nullable = boleh kosong)
-            $table->date('tanggal_kegiatan'); // Tanggal pelaksanaan
-            $table->timestamps(); // Otomatis mencatat kapan data dibuat & diedit
+            $table->id();
+            $table->string('judul');
+            $table->string('slug')->unique();
+            $table->string('kategori')->default('Berita'); 
+            $table->text('konten');
+            $table->string('foto_1')->nullable(); // Ini wajib/utama buat Thumbnail depan
+            $table->string('foto_2')->nullable(); // Opsional
+            $table->string('foto_3')->nullable(); // Opsional
+            
+            $table->enum('status', ['draft', 'published'])->default('published');
+            $table->date('tgl_kegiatan');
+            $table->timestamps();
         });
     }
 
-    /**
-     * Batalkan migration (hapus tabel).
-     */
     public function down(): void
     {
         Schema::dropIfExists('kegiatans');

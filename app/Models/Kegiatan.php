@@ -12,8 +12,12 @@ class Kegiatan extends Model
     protected $fillable = [
         'judul',
         'slug',
+        'kategori',
         'konten',
-        'foto',
-        'tanggal_kegiatan',
+        'foto_1',
+        'foto_2',
+        'foto_3', 
+        'status',
+        'tgl_kegiatan'
     ];
 }

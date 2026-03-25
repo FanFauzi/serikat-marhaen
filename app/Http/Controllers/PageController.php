@@ -7,20 +7,19 @@ use Illuminate\Http\Request;
 
 class PageController extends Controller
 {
-    // Menampilkan halaman utama (Beranda)
+    // Menampilkan halaman depan (Landing Page)
     public function beranda()
     {
-        // Ambil 3 kegiatan terbaru saja untuk di halaman depan
-        $kegiatan_terbaru = Kegiatan::latest()->take(3)->get(); 
-        
-        return view('welcome', compact('kegiatan_terbaru'));
+        // Ambil 6 berita terbaru untuk dipamerkan di depan
+        $kegiatans = Kegiatan::latest()->take(6)->get();
+        return view('welcome', compact('kegiatans'));
     }
 
-    // Menampilkan detail satu kegiatan berdasarkan slug-nya
+    // Menampilkan halaman baca berita utuh untuk publik
     public function detailKegiatan($slug)
     {
+        // Cari berita berdasarkan slug (link URL)
         $kegiatan = Kegiatan::where('slug', $slug)->firstOrFail();
-        
         return view('kegiatan_detail', compact('kegiatan'));
     }
 }
